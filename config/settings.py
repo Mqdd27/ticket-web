@@ -127,3 +127,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
+
+# Midtrans (kosong = pakai simulasi bayar saat DEBUG). Ambil key di dashboard Midtrans → Settings → Access Keys.
+MIDTRANS_SERVER_KEY = os.environ.get("MIDTRANS_SERVER_KEY", "")
+MIDTRANS_CLIENT_KEY = os.environ.get("MIDTRANS_CLIENT_KEY", "")
+MIDTRANS_PRODUCTION = os.environ.get("MIDTRANS_PRODUCTION") == "1"
