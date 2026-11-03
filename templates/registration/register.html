@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Daftar · TicketWeb{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto px-4 pt-12">
+  <div class="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+    <h1 class="text-2xl font-extrabold">Buat akun</h1>
+    <p class="text-gray-500 text-sm mt-1">Satu akun untuk semua e-ticket dan riwayat pembelian.</p>
+    <form method="post" class="mt-6 space-y-4" novalidate>{% csrf_token %}
+      {% include "registration/_field.html" with f=form.first_name ac="name" %}
+      {% include "registration/_field.html" with f=form.username ac="username" hint="Huruf, angka, dan @ . + - _ saja." %}
+      {% include "registration/_field.html" with f=form.email ac="email" %}
+      {% include "registration/_field.html" with f=form.password1 ac="new-password" hint="Minimal 8 karakter, jangan cuma angka." %}
+      {% include "registration/_field.html" with f=form.password2 ac="new-password" %}
+      <button class="w-full h-12 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">Daftar</button>
+    </form>
+    <p class="mt-5 text-sm text-center text-gray-500">Sudah punya akun? <a href="{% url 'login' %}" class="font-semibold text-blue-600 hover:underline">Masuk</a></p>
+  </div>
+</div>
+{% endblock %}
