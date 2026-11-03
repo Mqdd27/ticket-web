@@ -1,6 +1,6 @@
 {% if events %}
-<div class="scroll-row flex gap-4 overflow-x-auto -mx-4 px-4 pb-2">
-  {% for e in events %}<div class="w-64 sm:w-72 shrink-0">{% if b.s.kind == "trending" %}{% include "sections/_card.html" with rank=forloop.counter %}{% else %}{% include "sections/_card.html" %}{% endif %}</div>{% endfor %}
+<div class="scroll-row flex gap-4 overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 pb-2">
+  {% for e in events %}<div class="w-64 sm:w-72 lg:w-[calc((100%-3rem)/4)] shrink-0">{% if b.s.kind == "trending" %}{% include "sections/_card.html" with rank=forloop.counter %}{% else %}{% include "sections/_card.html" %}{% endif %}</div>{% endfor %}
 </div>
 {% else %}
 <p class="text-gray-500 text-sm py-6">{% if show_distance %}Belum ada acara dengan lokasi terdekat.{% else %}Belum ada acara di sini.{% endif %}</p>

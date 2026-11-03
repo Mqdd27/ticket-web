@@ -2,7 +2,7 @@
 {% load static %}
 {% block head %}<script type="module" src="{% static 'js/hero.js' %}"></script>{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 pt-6">
+<div class="max-w-7xl mx-auto px-4 lg:px-8 pt-6">
   <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950 via-blue-900 to-purple-900 h-72 sm:h-80 lg:h-96">
     <canvas id="hero-canvas" class="absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
     <div class="relative z-10 h-full flex flex-col justify-center px-6 sm:px-12 text-white">
@@ -19,7 +19,7 @@
 {% for b in blocks %}
   {% with tpl="sections/"|add:b.s.kind|add:".html" %}{% include tpl %}{% endwith %}
 {% empty %}
-  <p class="max-w-6xl mx-auto px-4 py-12 text-gray-500">Belum ada section. Tambahkan di Admin → Home sections.</p>
+  <p class="max-w-7xl mx-auto px-4 lg:px-8 py-12 text-gray-500">Belum ada section. Tambahkan di Admin → Home sections.</p>
 {% endfor %}
 {% endblock %}
 {% block scripts %}<script type="module" src="{% static 'js/stage.js' %}"></script>{% endblock %}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Jelajah acara · TicketWeb{% endblock %}
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 pt-8">
+<div class="max-w-7xl mx-auto px-4 lg:px-8 pt-8">
   <h1 class="text-3xl font-extrabold tracking-tight">{% if city %}Acara di {{ city }}{% elif q %}Hasil untuk "{{ q }}"{% else %}Jelajah acara{% endif %}</h1>
   <form class="mt-4 flex flex-wrap gap-2" role="search">
     <input name="q" value="{{ q }}" placeholder="Cari…" aria-label="Cari acara" class="h-11 flex-1 min-w-48 rounded-lg border border-gray-300 px-4 bg-white">

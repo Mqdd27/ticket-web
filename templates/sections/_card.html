@@ -1,6 +1,6 @@
 {% load humanize %}
 <a href="{% url 'event_detail' e.slug %}" class="group block bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition">
-  <div class="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+  <div class="relative aspect-[16/9] bg-gray-100 overflow-hidden">
     {% if e.image_url %}<img src="{{ e.image_url }}" alt="" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">{% endif %}
     {% if rank %}<span class="absolute left-3 top-3 grid place-items-center w-9 h-9 rounded-full bg-blue-600 text-white font-extrabold">{{ rank }}</span>{% endif %}
     {% if show_distance %}<span class="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-bold">{{ e.distance|floatformat:0 }} km</span>{% endif %}
