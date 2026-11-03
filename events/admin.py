@@ -50,7 +50,7 @@ class TicketInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["code", "user", "ticket_type", "quantity", "promo", "total_rp", "status", "created_at"]
+    list_display = ["code", "user", "ticket_type", "quantity", "promo", "total_rp", "status", "payment_type", "created_at"]
     list_filter = ["status"]
     inlines = [TicketInline]
     actions = ["generate_tickets"]
