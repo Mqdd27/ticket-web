@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load humanize %}
 {% block title %}{{ event.title }} · TicketWeb{% endblock %}
-{% block head %}{% if event.lat is not None %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endif %}{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 lg:px-8 pt-6 pb-28 lg:pb-8">
   <a href="{% url 'event_list' %}" class="inline-flex h-11 items-center text-sm font-semibold text-gray-500 hover:text-gray-900">← Semua acara</a>
@@ -22,19 +21,7 @@
       </section>
       <section>
         <h2 class="text-xl font-extrabold mb-3">Lokasi</h2>
-        <div class="rounded-2xl border border-gray-200 bg-white overflow-hidden">
-          {% if event.lat is not None %}<div id="map" class="h-72 sm:h-80 z-0" aria-label="Peta lokasi {{ event.venue }}"></div>{% endif %}
-          <div class="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-            <div class="flex-1">
-              <p class="font-bold">{{ event.venue }}</p>
-              <p class="text-sm text-gray-600">{{ event.address|default:event.city }}</p>
-            </div>
-            {% if event.lat is not None %}
-            <a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query={{ event.lat }},{{ event.lng }}"
-               class="inline-flex h-11 items-center justify-center px-4 rounded-lg border border-gray-300 text-sm font-semibold hover:border-gray-900">Buka di Google Maps</a>
-            {% endif %}
-          </div>
-        </div>
+        {% include "events/_location.html" %}
       </section>
     </div>
 
@@ -75,13 +62,4 @@
   <a href="#beli" class="shrink-0 inline-flex h-12 items-center px-6 rounded-xl bg-blue-600 text-white font-bold">Pilih tiket</a>
 </div>
 {% endblock %}
-{% block scripts %}
-{% if event.lat is not None %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  const map = L.map("map", { scrollWheelZoom: false }).setView([{{ event.lat|stringformat:"f" }}, {{ event.lng|stringformat:"f" }}], 15);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "&copy; OpenStreetMap" }).addTo(map);
-  L.marker([{{ event.lat|stringformat:"f" }}, {{ event.lng|stringformat:"f" }}]).addTo(map).bindPopup("{{ event.venue|escapejs }}").openPopup();
-</script>
-{% endif %}
-{% endblock %}
+
