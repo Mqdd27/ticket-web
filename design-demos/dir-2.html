@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karcis · Arah 2 · Agenda Berwarna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+  :root { --ink: #111; --paper: #fff; --soft: #f1f1f1; --muted: #555;
+    --Musik: #ff4d2e; --Festival: #ffc400; --Komedi: #00a676; --Seminar: #2f5bff; --Pameran: #ff6fbf; --Semua: #111; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font: 16px/1.5 Archivo, system-ui, sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  button, input { font: inherit; color: inherit; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .x { font-stretch: 125%; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; line-height: .9; }
+  .c { font-stretch: 70%; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }
+
+  nav.top { background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 20; }
+  nav.top .wrap { height: 64px; display: flex; align-items: center; gap: 20px; }
+  .logo { font-size: 24px; margin-right: auto; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 20px; border: 2px solid currentColor; background: none; cursor: pointer; font-weight: 800; font-stretch: 85%; text-transform: uppercase; letter-spacing: .02em; font-size: 15px; transition: transform .15s; }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 currentColor; }
+  .btn.fill { background: var(--ink); color: #fff; border-color: var(--ink); }
+  nav .btn.fill { background: #fff; color: var(--ink); border-color: #fff; }
+  .btn[disabled] { opacity: .35; pointer-events: none; }
+  .hi { font-weight: 600; opacity: .8; }
+
+  .marquee { overflow: hidden; border-bottom: 2px solid var(--ink); white-space: nowrap; }
+  .marquee div { display: inline-flex; animation: run 40s linear infinite; }
+  .marquee span { padding: 14px 24px; font-size: 18px; border-right: 2px solid var(--ink); }
+  .marquee i { font-style: normal; display: inline-block; width: 12px; height: 12px; margin-right: 10px; vertical-align: 1px; }
+  @keyframes run { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee div { animation: none; } }
+
+  .hero { padding: 56px 0 40px; }
+  .hero h1 { font-size: clamp(56px, 11vw, 168px); }
+  .hero-row { display: flex; gap: 24px; align-items: end; justify-content: space-between; flex-wrap: wrap; margin-top: 32px; }
+  .hero p { font-size: 20px; max-width: 34rem; }
+  .search { display: flex; border: 2px solid var(--ink); width: min(100%, 460px); }
+  .search input { flex: 1; min-width: 0; border: 0; outline: 0; padding: 0 16px; height: 56px; font-size: 17px; background: none; }
+  .search input:focus { background: #fffbe0; }
+  .search .btn { border: 0; border-left: 2px solid var(--ink); min-height: 56px; }
+
+  .cats { display: flex; flex-wrap: wrap; gap: 0; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+  .cats button { flex: 1 1 auto; min-height: 60px; padding: 0 20px; border: 0; border-right: 2px solid var(--ink); background: none; cursor: pointer; font-size: 17px; display: flex; align-items: center; gap: 10px; justify-content: center; }
+  .cats button:last-child { border-right: 0; }
+  .cats button i { width: 14px; height: 14px; background: var(--k); }
+  .cats button[aria-pressed=true] { background: var(--k); color: #fff; }
+  .cats button[aria-pressed=true][data-v=Festival] { color: var(--ink); }
+  .cats button[aria-pressed=true] i { background: #fff; }
+
+  .month { font-size: clamp(28px, 4vw, 48px); padding: 48px 0 16px; border-bottom: 2px solid var(--ink); }
+  .row { display: grid; grid-template-columns: 150px 1fr 220px; border-bottom: 2px solid var(--ink); min-height: 150px; position: relative; transition: background .2s; }
+  .row:hover { background: var(--soft); }
+  .date { background: var(--k); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 2px solid var(--ink); }
+  .date[data-k=Festival] { color: var(--ink); }
+  .date b { font-size: 72px; }
+  .date span { font-size: 16px; margin-top: 6px; }
+  .info { padding: 22px 28px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+  .tag { align-self: flex-start; font-size: 13px; padding: 3px 10px; border: 2px solid var(--ink); }
+  .info h3 { font-size: clamp(24px, 3vw, 38px); }
+  .info .where { color: var(--muted); font-size: 16px; }
+  .side { position: relative; border-left: 2px solid var(--ink); overflow: hidden; }
+  .side img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); transition: filter .3s; }
+  .row:hover .side img { filter: none; }
+  .side .price { position: absolute; left: 0; bottom: 0; background: var(--paper); padding: 8px 14px; font-size: 16px; border-top: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+  .side .price.out { background: var(--ink); color: #fff; }
+  .empty { padding: 48px 0; font-size: 20px; }
+
+  /* detail */
+  .dhead { background: var(--k); color: #fff; border-bottom: 2px solid var(--ink); }
+  .dhead[data-k=Festival] { color: var(--ink); }
+  .dhead .wrap { display: grid; grid-template-columns: 1fr auto; gap: 32px; padding-top: 32px; padding-bottom: 48px; align-items: end; }
+  .dhead h1 { font-size: clamp(44px, 8vw, 120px); margin-top: 24px; }
+  .bigdate { text-align: right; }
+  .bigdate b { font-size: clamp(80px, 12vw, 200px); display: block; }
+  .bigdate span { font-size: 22px; }
+  .back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+  .dbody { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid var(--ink); }
+  .dbody > * { padding: 40px 24px; }
+  .dbody .about { border-right: 2px solid var(--ink); }
+  .dbody .about img { width: 100%; aspect-ratio: 16/10; object-fit: cover; border: 2px solid var(--ink); margin-bottom: 24px; }
+  .dbody .about p { font-size: 18px; margin-bottom: 14px; max-width: 58ch; }
+  .dbody h2 { font-size: 32px; margin-bottom: 16px; }
+  .tt { display: flex; gap: 16px; align-items: center; border: 2px solid var(--ink); padding: 18px; margin-bottom: -2px; }
+  .tt .n { flex: 1; }
+  .tt .n b { font-size: 22px; display: block; }
+  .tt .n small { font-size: 15px; color: var(--muted); }
+  .tt .n small.hot { color: #c4210a; font-weight: 700; }
+  .tt.off { background: repeating-linear-gradient(-45deg, #fff 0 10px, #eee 10px 20px); }
+  .step { display: flex; border: 2px solid var(--ink); }
+  .step button { width: 48px; height: 48px; border: 0; background: none; font-size: 22px; font-weight: 800; cursor: pointer; }
+  .step button:hover { background: var(--ink); color: #fff; }
+  .step button:disabled { opacity: .25; pointer-events: none; }
+  .step span { width: 44px; display: grid; place-items: center; font-size: 20px; font-weight: 800; border-left: 2px solid var(--ink); border-right: 2px solid var(--ink); }
+  .total { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; font-size: 18px; }
+  .total b { font-size: 36px; }
+  .buy { width: 100%; min-height: 64px; font-size: 20px; }
+  .fine { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  /* auth */
+  .auth { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 64px); }
+  .auth .big { background: var(--Festival); border-right: 2px solid var(--ink); padding: 48px 32px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+  .auth .big.reg { background: var(--Seminar); color: #fff; }
+  .auth .big h1 { font-size: clamp(56px, 7.5vw, 128px); }
+  .auth .big p { font-size: 20px; max-width: 26rem; }
+  .auth form { padding: 56px clamp(24px, 6vw, 96px); max-width: 620px; width: 100%; align-self: center; }
+  .switch { display: flex; border: 2px solid var(--ink); margin-bottom: 32px; }
+  .switch a { flex: 1; text-align: center; padding: 12px; font-weight: 800; font-stretch: 85%; text-transform: uppercase; min-height: 48px; }
+  .switch a.on { background: var(--ink); color: #fff; }
+  label { display: block; font-weight: 700; font-size: 15px; margin: 18px 0 6px; }
+  .field { width: 100%; height: 54px; border: 2px solid var(--ink); padding: 0 16px; font-size: 17px; outline: 0; background: #fff; }
+  .field:focus { box-shadow: 4px 4px 0 var(--ink); }
+  .field.bad { border-color: #c4210a; box-shadow: 4px 4px 0 #c4210a; }
+  .err { color: #c4210a; font-weight: 700; font-size: 14px; margin-top: 8px; }
+  form .buy { margin-top: 32px; }
+  .alt { margin-top: 20px; font-size: 15px; }
+  .alt a { text-decoration: underline; font-weight: 700; }
+
+  /* checkout */
+  .clock { background: var(--ink); color: #fff; }
+  .clock .wrap { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 20px; padding-bottom: 20px; flex-wrap: wrap; }
+  .clock b { font-size: clamp(48px, 8vw, 96px); font-variant-numeric: tabular-nums; }
+  .co { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 2px solid var(--ink); }
+  .co > * { padding: 40px 24px; }
+  .co > section { border-right: 2px solid var(--ink); }
+  .m { display: flex; width: 100%; text-align: left; gap: 16px; align-items: center; border: 2px solid var(--ink); background: #fff; padding: 18px; margin-bottom: -2px; cursor: pointer; min-height: 72px; }
+  .m b { font-size: 20px; display: block; }
+  .m small { color: var(--muted); font-size: 15px; }
+  .m[aria-pressed=true] { background: var(--Festival); }
+  .m .box { width: 24px; height: 24px; border: 2px solid var(--ink); flex: none; }
+  .m[aria-pressed=true] .box { background: var(--ink); box-shadow: inset 0 0 0 4px var(--Festival); }
+  .ln { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 2px solid var(--ink); font-size: 18px; }
+
+  /* done */
+  .done { max-width: 880px; margin: 48px auto 80px; display: grid; grid-template-columns: 1fr 280px; border: 2px solid var(--ink); }
+  .done .l { background: var(--k); color: #fff; padding: 32px; }
+  .done .l[data-k=Festival] { color: var(--ink); }
+  .done .l h1 { font-size: clamp(36px, 5vw, 60px); margin: 12px 0 24px; }
+  .done .l dl { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .done dt { font-size: 13px; opacity: .85; }
+  .done dd { font-weight: 800; font-size: 17px; }
+  .done .r { border-left: 2px dashed var(--ink); padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 12px; justify-content: center; }
+  .done .r svg { width: 200px; height: 200px; }
+  .done .r code { font-size: 16px; font-weight: 800; letter-spacing: .15em; }
+
+  footer { padding: 40px 0 120px; font-size: 15px; color: var(--muted); }
+  .mbar { display: none; }
+
+  @media (max-width: 860px) {
+    nav .hi { display: none; }
+    .row { grid-template-columns: 96px 1fr; min-height: 120px; }
+    .date b { font-size: 44px; }
+    .date span { font-size: 13px; }
+    .side { grid-column: 1 / -1; border-left: 0; border-top: 2px solid var(--ink); height: 160px; }
+    .info { padding: 16px; }
+    .cats { flex-wrap: nowrap; overflow-x: auto; }
+    .cats button { flex: none; }
+    .dhead .wrap, .dbody, .auth, .co, .done { grid-template-columns: 1fr; }
+    .bigdate { text-align: left; }
+    .dbody .about, .co > section { border-right: 0; border-bottom: 2px solid var(--ink); }
+    .auth .big { min-height: 220px; border-right: 0; border-bottom: 2px solid var(--ink); padding: 28px 24px; }
+    .auth .big p { display: none; }
+    .done { margin: 24px 16px 80px; }
+    .done .r { border-left: 0; border-top: 2px dashed var(--ink); }
+    .dbody .buy-wide { display: none; }
+    .mbar { display: flex; position: fixed; inset: auto 0 0; z-index: 30; background: #fff; border-top: 2px solid var(--ink); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); gap: 12px; align-items: center; justify-content: space-between; }
+    .mbar b { font-size: 24px; }
+    .mbar .btn { min-height: 52px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const nav = (c) => `<nav class="top"><div class="wrap">
+  <a class="logo x" href="#/">Karcis</a>
+  ${c.user ? `<span class="hi">Hai, ${c.esc(c.user.name)}</span><button class="btn" data-act="logout">Keluar</button>`
+           : `<a class="btn" href="#/login">Masuk</a><a class="btn fill" href="#/register">Daftar</a>`}
+</div></nav>`;
+const k = (e) => `style="--k:var(--${e.cat})" data-k="${e.cat}"`;
+const day = (c, e) => c.dt(e.date, { day: "2-digit" });
+const mon = (c, e) => c.dt(e.date, { weekday: "short", month: "short" });
+
+function list(c) {
+  if (!c.list.length) return `<p class="empty c">Tidak ada event untuk "${c.esc(c.q)}".</p>`;
+  let last = "", out = "";
+  for (const e of c.list) {
+    const m = c.dt(e.date, { month: "long", year: "numeric" });
+    if (m !== last) { out += `<h2 class="month x">${m}</h2>`; last = m; }
+    out += `<a class="row" href="#/event/${e.id}" ${k(e)}>
+      <div class="date" ${k(e)}><b class="x">${day(c, e)}</b><span class="c">${mon(c, e)}</span></div>
+      <div class="info"><span class="tag c">${e.cat}</span><h3 class="x">${e.title}</h3><div class="where">${e.venue}, ${e.city} · 19.00 WIB</div></div>
+      <div class="side"><img src="${e.img}" alt="" loading="lazy"><span class="price c ${e.soldOut ? "out" : ""}">${e.soldOut ? "Habis" : e.from ? "Mulai " + c.rp(e.from) : "Gratis"}</span></div>
+    </a>`;
+  }
+  return out;
+}
+
+const field = (c, n, lab, type = "text", ac = "") => `<label for="${n}">${lab}</label>
+  <input class="field${c.errors[n] ? " bad" : ""}" id="${n}" name="${n}" type="${type}" autocomplete="${ac}" value="${type === "password" ? "" : c.esc(c.values[n])}">
+  ${c.errors[n] ? `<div class="err">${c.errors[n]}</div>` : ""}`;
+
+const auth = (c, reg) => `${nav(c)}<div class="auth">
+  <div class="big ${reg ? "reg" : ""}"><h1 class="x">${reg ? "Gabung." : "Masuk."}</h1><p>${c.next ? "Tiket pilihanmu masih kami simpan. Masuk dulu, lalu bayar." : "Satu akun untuk semua tiket, e-ticket, dan riwayat pembelian."}</p></div>
+  <form data-form="${reg ? "register" : "login"}" novalidate>
+    <div class="switch"><a href="#/login" class="${reg ? "" : "on"}">Masuk</a><a href="#/register" class="${reg ? "on" : ""}">Daftar</a></div>
+    ${reg ? field(c, "name", "Nama lengkap", "text", "name") : ""}
+    ${field(c, "email", "Email", "email", "email")}
+    ${field(c, "password", "Password", "password", reg ? "new-password" : "current-password")}
+    ${reg ? field(c, "password2", "Ulangi password", "password", "new-password") : ""}
+    <button class="btn fill buy" type="submit">${reg ? "Buat akun" : "Masuk"}</button>
+    <p class="alt">${reg ? 'Sudah punya akun? <a href="#/login">Masuk</a>' : 'Belum punya akun? <a href="#/register">Daftar gratis</a>'}</p>
+  </form></div>`;
+
+const qr = (code) => [...Array(441)].map((_, i) => { const x = i % 21, y = (i / 21) | 0;
+  const f = (a, b) => x >= a && x < a + 7 && y >= b && y < b + 7;
+  const on = f(0, 0) || f(14, 0) || f(0, 14) ? !(((x % 14 === 1 || x % 14 === 5) && y % 14 > 0 && y % 14 < 6) || ((y % 14 === 1 || y % 14 === 5) && x % 14 > 0 && x % 14 < 6)) : (code.charCodeAt((x * 7 + y * 3) % 8) * (x + 1) * (y + 3)) % 7 < 3;
+  return on ? `<rect x="${x}" y="${y}" width="1" height="1"/>` : ""; }).join("");
+
+window.VIEWS = {
+  list,
+  home: (c) => {
+    const names = c.EVENTS.map((e) => `<span class="c"><i style="background:var(--${e.cat})"></i>${e.title} · ${c.dt(e.date, { day: "numeric", month: "short" })}</span>`).join("");
+    return `${nav(c)}
+    <div class="marquee" aria-hidden="true"><div>${names}${names}</div></div>
+    <main class="wrap">
+      <section class="hero">
+        <h1 class="x">Mau ke mana minggu ini?</h1>
+        <div class="hero-row"><p>Konser, festival, komedi, seminar. ${c.EVENTS.length} event dalam 60 hari, sisa kuota selalu jujur.</p>
+          <div class="search"><input id="q" type="search" placeholder="Cari event atau kota" value="${c.esc(c.q)}" aria-label="Cari event"><button class="btn">Cari</button></div></div>
+      </section>
+      <div class="cats" role="group" aria-label="Kategori">${c.CATS.map((x) => `<button class="c" style="--k:var(--${x})" data-act="cat" data-v="${x}" aria-pressed="${x === c.cat}"><i></i>${x}</button>`).join("")}</div>
+      <div id="list">${list(c)}</div>
+      <footer>© 2026 Karcis · Prototipe arah 2 · Bayar via QRIS, VA, e-wallet</footer>
+    </main>`;
+  },
+  event: (c) => {
+    const e = c.ev;
+    return `${nav(c)}
+    <header class="dhead" ${k(e)}><div class="wrap">
+      <div><a class="back" href="#/">← Semua event</a><h1 class="x">${e.title}</h1><p style="font-size:20px;margin-top:16px">${e.venue}, ${e.city} · 19.00 WIB</p></div>
+      <div class="bigdate"><b class="x">${day(c, e)}</b><span class="c">${c.dt(e.date, { weekday: "long", month: "long", year: "numeric" })}</span></div>
+    </div></header>
+    <div class="wrap dbody">
+      <section class="about"><img src="${e.img}" alt="">
+        <p>${e.title} di ${e.venue}, ${e.city}. Gerbang dibuka 2 jam sebelum acara. Tunjukkan e-ticket QR di pintu masuk; satu QR untuk satu orang.</p>
+        <p>Tiket tidak dapat dikembalikan kecuali acara dibatalkan penyelenggara.</p></section>
+      <section>
+        <h2 class="x">Tiket</h2>
+        ${e.tickets.map((t) => { const n = c.qty[t.id] || 0; return `<div class="tt ${t.left ? "" : "off"}">
+          <div class="n"><b class="c">${t.name}</b><small class="${t.left && t.left <= 20 ? "hot" : ""}">${c.rp(t.price)} · ${t.left ? (t.left <= 20 ? `Tinggal ${t.left}!` : `Sisa ${t.left} dari ${t.quota}`) : "Habis terjual"}</small></div>
+          ${t.left ? `<div class="step"><button data-act="qty" data-t="${t.id}" data-v="-1" ${n ? "" : "disabled"} aria-label="Kurangi">−</button><span aria-live="polite">${n}</span><button data-act="qty" data-t="${t.id}" data-v="1" ${n >= Math.min(t.left, 10) ? "disabled" : ""} aria-label="Tambah">+</button></div>` : ""}
+        </div>`; }).join("")}
+        <div class="total"><span>${c.count} tiket</span><b class="x">${c.rp(c.total)}</b></div>
+        <button class="btn fill buy buy-wide" data-act="buy" ${c.count ? "" : "disabled"}>${c.user ? "Lanjut bayar" : "Masuk & beli"}</button>
+        <p class="fine">Maks. 10 tiket per transaksi. Kursi ditahan 15 menit setelah checkout.</p>
+      </section>
+    </div>
+    <div class="mbar"><div><small>${c.count} tiket</small><br><b class="x">${c.rp(c.total)}</b></div><button class="btn fill" data-act="buy" ${c.count ? "" : "disabled"}>${c.user ? "Bayar" : "Masuk & beli"}</button></div>
+    <footer class="wrap">© 2026 Karcis</footer>`;
+  },
+  login: (c) => auth(c, false),
+  register: (c) => auth(c, true),
+  checkout: (c) => {
+    const o = c.order, M = [["qris", "QRIS", "Semua e-wallet & m-banking"], ["va", "Virtual Account", "BCA, BNI, BRI, Mandiri"], ["gopay", "GoPay", "Langsung dari aplikasi"]];
+    return `${nav(c)}
+    <div class="clock"><div class="wrap"><span class="c" style="font-size:20px">Bayar sebelum kursi dilepas</span><b class="x" data-countdown>15:00</b></div></div>
+    <div class="wrap co">
+      <section><h2 class="x" style="font-size:32px;margin-bottom:16px">Bayar pakai</h2>
+        ${M.map(([v, n, s]) => `<button class="m" data-act="pay-method" data-v="${v}" aria-pressed="${o.pay === v}"><span class="box"></span><span><b class="c">${n}</b><small>${s}</small></span></button>`).join("")}</section>
+      <section><h2 class="x" style="font-size:32px">${o.ev.title}</h2><p style="margin:8px 0 20px;color:var(--muted)">${c.dt(o.ev.date)} · ${o.ev.venue}</p>
+        ${o.lines.map((l) => `<div class="ln"><span>${l.n}× ${l.name}</span><span>${c.rp(l.n * l.price)}</span></div>`).join("")}
+        <div class="total"><span>Total</span><b class="x">${c.rp(o.total)}</b></div>
+        <button class="btn fill buy" data-act="pay">Bayar ${c.rp(o.total)}</button>
+        <p class="fine">Prototipe: tombol ini mensimulasikan pembayaran sukses.</p></section>
+    </div>`;
+  },
+  done: (c) => {
+    const o = c.order, e = o.ev;
+    return `${nav(c)}<div class="wrap"><article class="done">
+      <div class="l" ${k(e)}><span class="c">Lunas · e-ticket</span><h1 class="x">${e.title}</h1>
+        <dl><div><dt>Tanggal</dt><dd>${c.dt(e.date)}, 19.00</dd></div><div><dt>Lokasi</dt><dd>${e.venue}</dd></div>
+        <div><dt>Tiket</dt><dd>${o.lines.map((l) => l.n + "× " + l.name).join(", ")}</dd></div><div><dt>Atas nama</dt><dd>${c.esc(c.user?.name)}</dd></div></dl></div>
+      <div class="r"><svg viewBox="-1 -1 23 23" role="img" aria-label="QR tiket (contoh)"><rect x="-1" y="-1" width="23" height="23" fill="#fff"/>${qr(o.code)}</svg><code>${o.code}</code><a class="btn" href="#/">Beranda</a></div>
+    </article></div>`;
+  },
+};
+</script>
+<script src="proto.js"></script>
+</body>
+</html>

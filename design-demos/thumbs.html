@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Karcis · 6 kandidat arah</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Archivo:wdth,wght@125,900&family=IBM+Plex+Sans:wght@400;600&family=Newsreader:wght@400&family=Noto+Serif:wght@700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #e9e9e6; font: 14px/1.4 "IBM Plex Sans", system-ui; color: #141414; padding: 32px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.sub { margin: 0 0 24px; color: #555; }
+  .g { display: grid; grid-template-columns: repeat(3, 480px); gap: 28px 24px; }
+  figure { margin: 0; }
+  .f { width: 480px; height: 300px; overflow: hidden; position: relative; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.15); background: #fff; }
+  .f iframe { width: 1440px; height: 900px; border: 0; transform: scale(.3333); transform-origin: 0 0; pointer-events: none; }
+  figcaption { margin-top: 8px; font-size: 14px; }
+  figcaption b { display: block; }
+  figcaption span { color: #555; }
+  .pick { color: #0d6b3b; font-weight: 600; }
+  /* D: DICE-like feed */
+  .d { background: #0b0b0b; color: #fff; display: grid; grid-template-columns: 1fr 1fr; }
+  .d .poster { background: url(https://picsum.photos/seed/event-1/500/700) center/cover; }
+  .d .t { padding: 22px; display: flex; flex-direction: column; justify-content: end; gap: 6px; }
+  .d .t b { font: 800 30px/1 Sora; }
+  .d .t button { margin-top: 12px; height: 40px; border-radius: 999px; border: 0; background: #fff; font-weight: 600; }
+  /* E: Hara white */
+  .e { background: #fbfbfa; display: grid; place-items: center; text-align: center; }
+  .e img { width: 150px; height: 100px; object-fit: cover; }
+  .e b { font: 400 22px Newsreader; display: block; margin-top: 18px; }
+  .e small { color: #777; letter-spacing: .1em; }
+  /* F: Sugiura ring */
+  .fz { background: #1c1712; color: #efe6d3; }
+</style>
+</head>
+<body>
+<h1>Karcis · 6 kandidat arah</h1>
+<p class="sub">3 kandidat bertanda ✅ sudah dibuat jadi prototipe lengkap. 3 sisanya cadangan: pilih salah satu kalau mau dibuatkan versi lengkap.</p>
+<div class="g">
+  <figure><div class="f"><iframe src="dir-1.html" loading="lazy"></iframe></div>
+    <figcaption><b class="pick">A ✅ dir-1 · Sinematik gelap</b><span>Roulette #8 Cinematic Sound-Viz · gelombang Three.js</span></figcaption></figure>
+  <figure><div class="f"><iframe src="dir-2.html" loading="lazy"></iframe></div>
+    <figcaption><b class="pick">B ✅ dir-2 · Agenda berwarna</b><span>Studio Dumbar · tanggal raksasa, warna per kategori</span></figcaption></figure>
+  <figure><div class="f"><iframe src="dir-3.html" loading="lazy"></iframe></div>
+    <figcaption><b class="pick">C ✅ dir-3 · Daftar fungsional</b><span>Resident Advisor · bar sisa kuota per baris</span></figcaption></figure>
+  <figure><div class="f d"><div class="poster"></div><div class="t"><small>SEL, 17 NOV · GBK</small><b>Jakarta Music Fest 2026</b><span>Mulai Rp350.000</span><button>Beli tiket</button></div></div>
+    <figcaption><b>D · Feed poster</b><span>DICE · satu poster per layar, CTA nempel bawah. Cadangan: mirip A (gelap + foto)</span></figcaption></figure>
+  <figure><div class="f e"><div><img src="https://picsum.photos/seed/event-7/300/200" alt=""><b>Yogyakarta Art Expo</b><small>10 NOVEMBER · JOGJA EXPO CENTER</small></div></div>
+    <figcaption><b>E · Galeri putih</b><span>Kenya Hara · satu event per layar. Cadangan: terlalu sepi untuk 9+ event</span></figcaption></figure>
+  <figure><div class="f fz"><svg viewBox="0 0 480 300" width="480" height="300">
+      <text x="24" y="60" font-family="Noto Serif" font-weight="700" font-size="34" fill="#d9a63a">Nov · Jan</text>
+      <g transform="translate(300 150)" fill="none">
+        <circle r="128" stroke="#efe6d3" stroke-opacity=".3"/><circle r="96" stroke="#efe6d3" stroke-opacity=".3"/><circle r="40" fill="#efe6d3"/>
+        <path d="M0 -112 A112 112 0 0 1 97 -56" stroke="#d9a63a" stroke-width="18"/><path d="M97 56 A112 112 0 0 1 -56 97" stroke="#d2412c" stroke-width="18"/>
+        <circle r="9" fill="#d2412c"/></g>
+      <g font-size="12" fill="#efe6d3"><text x="24" y="210">● 8 Nov Seminar Investasi</text><text x="24" y="230">● 17 Nov Jakarta Music Fest</text><text x="24" y="250">● 2 Jan Bali Sunset</text></g></svg></div>
+    <figcaption><b>F · Cincin kalender</b><span>Roulette east #8 Sugiura Mandala. Cadangan: berlebihan, info lebih jelas tanpa cincin</span></figcaption></figure>
+</div>
+</body>
+</html>

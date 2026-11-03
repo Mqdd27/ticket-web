@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karcis · Arah 1 · Sinematik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#000; --panel:#0c0c10; --line:#24242c; --muted:#a3a3b2; --a:#4f6bff; --b:#b05cff; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: #fff; font: 16px/1.55 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  button, input { font: inherit; color: inherit; }
+  h1, h2, h3, .display { font-family: Sora, Inter, sans-serif; letter-spacing: -0.02em; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+  nav.top { position: absolute; inset: 0 0 auto; z-index: 5; }
+  nav.top .wrap { height: 72px; display: flex; align-items: center; gap: 28px; }
+  .logo { font: 800 22px Sora, sans-serif; letter-spacing: -0.04em; }
+  .nav-links { display: flex; gap: 24px; color: var(--muted); font-size: 15px; margin-right: auto; }
+  .nav-links a:hover { color: #fff; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 22px; border-radius: 999px; border: 1px solid var(--line); background: transparent; cursor: pointer; font-weight: 600; font-size: 15px; transition: background .2s, border-color .2s; }
+  .pill:hover { border-color: #555; }
+  .pill.solid { background: #fff; color: #000; border-color: #fff; }
+  .pill.solid:hover { background: #dcdcff; }
+  .pill[disabled] { opacity: .35; cursor: not-allowed; }
+
+  .hero { position: relative; height: min(88vh, 820px); min-height: 560px; overflow: hidden; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #000 0%, rgba(0,0,0,.75) 38%, rgba(0,0,0,0) 70%), linear-gradient(0deg, #000 0%, transparent 25%); pointer-events: none; }
+  .hero .wrap { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+  .hero h1 { font-size: clamp(48px, 8vw, 112px); line-height: .95; font-weight: 800; max-width: 9ch; }
+  .hero p { color: #d4d4de; font-size: 18px; max-width: 30rem; margin-top: 24px; }
+  .search { margin-top: 36px; display: flex; max-width: 520px; border: 1px solid #3a3a46; border-radius: 999px; background: rgba(12,12,16,.8); backdrop-filter: blur(8px); padding: 6px; }
+  .search input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; padding: 0 18px; font-size: 16px; }
+  .search input::placeholder { color: #8a8a99; }
+
+  .cats { display: flex; gap: 10px; overflow-x: auto; padding: 8px 0 28px; scrollbar-width: none; }
+  .cats button[aria-pressed=true] { background: linear-gradient(90deg, var(--a), var(--b)); border-color: transparent; }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 24px 0 8px; }
+  .section-head h2 { font-size: 32px; }
+  .section-head span { color: var(--muted); font-size: 15px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding-bottom: 96px; }
+  .card { position: relative; border-radius: 18px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); transition: transform .25s, border-color .25s; display: block; }
+  .card:hover { transform: translateY(-4px); border-color: #4a4a5a; }
+  .card img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; filter: saturate(.85); }
+  .card .meta { padding: 16px 18px 20px; }
+  .card .when { font-size: 13px; color: #c3c3ff; font-weight: 600; letter-spacing: .02em; }
+  .card h3 { font-size: 20px; margin: 4px 0 2px; line-height: 1.25; }
+  .card .where { color: var(--muted); font-size: 14px; }
+  .card .price { margin-top: 14px; font-weight: 600; }
+  .badge { position: absolute; top: 14px; right: 14px; background: #000; border: 1px solid #fff; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+  .empty { color: var(--muted); padding: 48px 0; }
+
+  /* detail */
+  .banner { position: relative; height: 56vh; min-height: 380px; }
+  .banner img { width: 100%; height: 100%; object-fit: cover; }
+  .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, #000 5%, rgba(0,0,0,.35) 60%, rgba(0,0,0,.6)); }
+  .banner .wrap { position: absolute; inset: auto 0 40px; z-index: 2; }
+  .banner h1 { font-size: clamp(36px, 6vw, 80px); line-height: 1; font-weight: 800; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 28px; color: #d4d4de; margin-top: 16px; }
+  .detail { display: grid; grid-template-columns: 1fr 420px; gap: 48px; padding: 40px 24px 120px; }
+  .detail .about p { color: #d4d4de; margin-bottom: 14px; max-width: 60ch; }
+  .detail .about h2 { font-size: 22px; margin-bottom: 12px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 24px; align-self: start; position: sticky; top: 24px; }
+  .panel h2 { font-size: 20px; margin-bottom: 8px; }
+  .tt { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .tt:first-of-type { border-top: 0; }
+  .tt .info { flex: 1; }
+  .tt .name { font-weight: 600; }
+  .tt .sub { color: var(--muted); font-size: 14px; }
+  .tt .sub.hot { color: #ffb4b4; }
+  .step { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; }
+  .step button { width: 44px; height: 44px; background: none; border: 0; cursor: pointer; font-size: 20px; }
+  .step button:disabled { opacity: .3; cursor: default; }
+  .step span { min-width: 24px; text-align: center; font-weight: 600; }
+  .sum { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-top: 1px solid var(--line); margin-top: 4px; }
+  .sum strong { font-size: 22px; font-family: Sora; }
+  .panel .pill { width: 100%; }
+  .note { color: var(--muted); font-size: 13px; margin-top: 12px; text-align: center; }
+  .back { display: inline-flex; min-height: 44px; align-items: center; color: var(--muted); font-size: 15px; }
+
+  /* auth */
+  .auth { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+  .auth .side { position: relative; overflow: hidden; border-right: 1px solid var(--line); }
+  .auth .side canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .auth .side .quote { position: absolute; left: 48px; bottom: 48px; right: 48px; font: 800 clamp(32px, 4vw, 56px)/1 Sora; z-index: 2; }
+  .auth .form { display: flex; flex-direction: column; justify-content: center; padding: 96px clamp(24px, 6vw, 96px) 48px; max-width: 560px; width: 100%; }
+  .tabs { display: flex; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin-bottom: 32px; }
+  .tabs a { flex: 1; text-align: center; padding: 10px; border-radius: 999px; color: var(--muted); font-weight: 600; min-height: 44px; }
+  .tabs a.on { background: #fff; color: #000; }
+  .auth h1 { font-size: 36px; margin-bottom: 6px; }
+  .auth .lead { color: var(--muted); margin-bottom: 28px; }
+  label { display: block; font-size: 14px; font-weight: 500; margin: 16px 0 6px; color: #d4d4de; }
+  .field { width: 100%; height: 50px; border-radius: 14px; border: 1px solid #34343f; background: var(--panel); padding: 0 16px; outline: 0; font-size: 16px; }
+  .field:focus { border-color: var(--a); box-shadow: 0 0 0 3px rgba(79,107,255,.25); }
+  .field.bad { border-color: #ff6b6b; }
+  .err { color: #ff8f8f; font-size: 13px; margin-top: 6px; }
+  .auth .pill.solid { width: 100%; margin-top: 28px; height: 52px; }
+  .alt { color: var(--muted); font-size: 14px; margin-top: 18px; text-align: center; }
+  .alt a { color: #fff; text-decoration: underline; }
+
+  /* checkout */
+  .co { display: grid; grid-template-columns: 1fr 400px; gap: 40px; padding-top: 112px; padding-bottom: 96px; }
+  .timer { display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 1px solid #3b3b6e; background: linear-gradient(90deg, rgba(79,107,255,.15), rgba(176,92,255,.15)); border-radius: 18px; padding: 18px 22px; margin-bottom: 28px; }
+  .timer b { font: 800 34px Sora; font-variant-numeric: tabular-nums; }
+  .co h2 { font-size: 22px; margin: 8px 0 14px; }
+  .methods { display: grid; gap: 10px; }
+  .method { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); cursor: pointer; text-align: left; min-height: 60px; }
+  .method[aria-pressed=true] { border-color: var(--b); box-shadow: 0 0 0 1px var(--b); }
+  .method .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #555; flex: none; }
+  .method[aria-pressed=true] .dot { border: 5px solid var(--b); }
+  .method small { display: block; color: var(--muted); font-size: 13px; }
+  .line { display: flex; justify-content: space-between; color: #d4d4de; padding: 6px 0; }
+
+  /* done */
+  .ticket { max-width: 460px; margin: 112px auto 96px; background: #fff; color: #000; border-radius: 24px; overflow: hidden; }
+  .ticket .top { padding: 28px; background: linear-gradient(120deg, var(--a), var(--b)); color: #fff; }
+  .ticket .top h1 { font-size: 28px; line-height: 1.1; }
+  .ticket .body { padding: 28px; display: grid; gap: 18px; }
+  .ticket dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ticket dt { font-size: 12px; color: #555; }
+  .ticket dd { font-weight: 600; }
+  .qr { width: 180px; height: 180px; margin: 0 auto; }
+  .ticket .code { text-align: center; font: 600 15px ui-monospace, monospace; letter-spacing: .15em; }
+
+  .foot { border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  .foot .wrap { padding: 32px 24px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+
+  .mbar { display: none; }
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    nav.top .wrap { justify-content: space-between; }
+    .hero { min-height: 600px; height: 92vh; }
+    .hero::after { background: linear-gradient(0deg, #000 30%, rgba(0,0,0,.55) 65%, rgba(0,0,0,.2)); }
+    .hero .wrap { justify-content: flex-end; padding-bottom: 48px; }
+    .hero p { font-size: 16px; }
+    .detail, .co { grid-template-columns: 1fr; gap: 28px; }
+    .panel { position: static; }
+    .panel .buy-wide { display: none; }
+    .mbar { display: flex; position: fixed; inset: auto 0 0; z-index: 10; gap: 16px; align-items: center; justify-content: space-between; padding: 12px 20px calc(12px + env(safe-area-inset-bottom)); background: rgba(10,10,14,.92); backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+    .mbar small { color: var(--muted); display: block; font-size: 13px; }
+    .mbar strong { font: 800 20px Sora; }
+    .auth { grid-template-columns: 1fr; }
+    .auth .side { height: 220px; border-right: 0; border-bottom: 1px solid var(--line); }
+    .auth .side .quote { left: 24px; bottom: 24px; font-size: 28px; }
+    .auth .form { padding: 32px 24px 48px; }
+    .co { padding-top: 96px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js";
+
+const nav = (c, solid) => `
+<nav class="top"${solid ? ' style="position:sticky;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);top:0"' : ""}>
+  <div class="wrap">
+    <a class="logo" href="#/">karcis</a>
+    <div class="nav-links"><a href="#/">Jelajah</a><a href="#/">Kota</a><a href="#/">Untuk EO</a></div>
+    ${c.user
+      ? `<span style="color:var(--muted);font-size:15px">Hai, ${c.esc(c.user.name)}</span><button class="pill" data-act="logout">Keluar</button>`
+      : `<a class="pill" href="#/login">Masuk</a><a class="pill solid" href="#/register">Daftar</a>`}
+  </div>
+</nav>`;
+const foot = `<footer class="foot"><div class="wrap"><span>© 2026 Karcis · Prototipe arah 1</span><span>Pembayaran aman via QRIS, VA, e-wallet</span></div></footer>`;
+const when = (c, e) => `${c.dt(e.date)} · 19.00 WIB`;
+
+const cardsHTML = (c) => c.list.length ? c.list.map((e) => `
+  <a class="card" href="#/event/${e.id}">
+    <img src="${e.img}" alt="" loading="lazy">
+    ${e.soldOut ? '<span class="badge">Habis</span>' : ""}
+    <div class="meta">
+      <div class="when">${when(c, e)}</div>
+      <h3>${e.title}</h3>
+      <div class="where">${e.venue}, ${e.city}</div>
+      <div class="price">${e.soldOut ? "Tiket habis" : (e.from ? "Mulai " + c.rp(e.from) : "Gratis")}</div>
+    </div>
+  </a>`).join("") : `<p class="empty">Tidak ada event untuk "${c.esc(c.q)}". Coba kata lain.</p>`;
+
+let stop;
+function wave(canvas, opts = {}) {
+  stop?.();
+  let r;
+  try { r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true }); } catch { return; }
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x000000, 28, 60);
+  const cam = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
+  const COLS = opts.cols || 150, ROWS = 7, N = COLS * ROWS, GAP = 0.27;
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(0.14, 1, 0.14), new THREE.MeshBasicMaterial(), N);
+  const m = new THREE.Matrix4(), col = new THREE.Color(), A = new THREE.Color("#4f6bff"), B = new THREE.Color("#b05cff");
+  for (let row = 0, i = 0; row < ROWS; row++) for (let x = 0; x < COLS; x++, i++) {
+    col.lerpColors(A, B, x / COLS).multiplyScalar(1 - row * 0.12);
+    mesh.setColorAt(i, col);
+  }
+  scene.add(mesh);
+  const p = { x: 0.3, tx: 0.3 };
+  const onMove = (e) => { p.tx = (e.clientX / innerWidth) * 2 - 1; };
+  addEventListener("pointermove", onMove);
+  const resize = () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    r.setSize(w, h, false); cam.aspect = w / h;
+    cam.position.set(opts.cx ?? 6, 4, w < 700 ? 52 : 36); cam.lookAt(opts.cx ?? 6, -1, 0);
+    cam.updateProjectionMatrix();
+  };
+  const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
+  let vis = true;
+  const io = new IntersectionObserver(([e]) => (vis = e.isIntersecting)); io.observe(canvas);
+  const t0 = performance.now();
+  const frame = () => {
+    const t = (performance.now() - t0) / 1000;
+    p.x += (p.tx - p.x) * 0.06;
+    for (let row = 0, i = 0; row < ROWS; row++) for (let x = 0; x < COLS; x++, i++) {
+      const u = x / COLS, px = (u * 2 - 1);
+      const env = 0.35 + 0.65 * Math.sin(u * Math.PI) ** 1.5;
+      const s = Math.abs(Math.sin(x * 0.21 + t * 2.1 - row * 0.5) * Math.sin(x * 0.047 - t * 0.8) + 0.45 * Math.sin(x * 0.61 + t * 3.4 + row));
+      const bump = 1.6 * Math.exp(-((px - p.x) ** 2) * 14);
+      const h = 0.12 + (s * env + bump * env) * 7 * (1 - row * 0.1);
+      m.makeScale(1, h, 1).setPosition((x - COLS / 2) * GAP, 0, -row * 1.6);
+      mesh.setMatrixAt(i, m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    r.render(scene, cam);
+  };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) frame();
+  else r.setAnimationLoop(() => vis && frame());
+  stop = () => { r.setAnimationLoop(null); r.dispose(); ro.disconnect(); io.disconnect(); removeEventListener("pointermove", onMove); stop = null; };
+}
+
+const field = (c, name, lab, type = "text", ac = "") => `
+  <label for="${name}">${lab}</label>
+  <input class="field${c.errors[name] ? " bad" : ""}" id="${name}" name="${name}" type="${type}" autocomplete="${ac}" value="${type === "password" ? "" : c.esc(c.values[name])}" ${c.errors[name] ? `aria-invalid="true" aria-describedby="${name}-e"` : ""}>
+  ${c.errors[name] ? `<div class="err" id="${name}-e">${c.errors[name]}</div>` : ""}`;
+
+const authPage = (c, reg) => `
+<nav class="top"><div class="wrap"><a class="logo" href="#/">karcis</a></div></nav>
+<div class="auth">
+  <div class="side"><canvas id="wave"></canvas><div class="quote">Kursi terbaik<br>nggak nunggu.</div></div>
+  <div class="form">
+    <div class="tabs" role="tablist"><a href="#/login" class="${reg ? "" : "on"}" role="tab" aria-selected="${!reg}">Masuk</a><a href="#/register" class="${reg ? "on" : ""}" role="tab" aria-selected="${reg}">Daftar</a></div>
+    <h1>${reg ? "Buat akun" : "Selamat datang lagi"}</h1>
+    <p class="lead">${c.next ? "Masuk dulu untuk lanjut ke pembayaran. Pilihan tiketmu kami simpan." : reg ? "Satu akun untuk semua tiket dan e-ticket kamu." : "Masuk untuk lihat tiket dan lanjut belanja."}</p>
+    <form data-form="${reg ? "register" : "login"}" novalidate>
+      ${reg ? field(c, "name", "Nama lengkap", "text", "name") : ""}
+      ${field(c, "email", "Email", "email", "email")}
+      ${field(c, "password", "Password", "password", reg ? "new-password" : "current-password")}
+      ${reg ? field(c, "password2", "Ulangi password", "password", "new-password") : ""}
+      <button class="pill solid" type="submit">${reg ? "Daftar" : "Masuk"}</button>
+    </form>
+    <p class="alt">${reg ? 'Sudah punya akun? <a href="#/login">Masuk</a>' : 'Belum punya akun? <a href="#/register">Daftar gratis</a>'}</p>
+  </div>
+</div>`;
+
+window.VIEWS = {
+  list: cardsHTML,
+  home: (c) => `
+    ${nav(c)}
+    <header class="hero">
+      <canvas id="wave" aria-hidden="true"></canvas>
+      <div class="wrap">
+        <h1>Malam ini, kota ini bersuara.</h1>
+        <p>${c.EVENTS.length} event dalam 60 hari ke depan. Sisa kuota real-time, bayar dalam 15 menit, e-ticket langsung di HP.</p>
+        <div class="search"><input id="q" type="search" placeholder="Cari artis, event, atau kota" value="${c.esc(c.q)}" aria-label="Cari event"><button class="pill solid" onclick="scrollTo({top:document.getElementById('list').offsetTop-120,behavior:'smooth'})">Cari</button></div>
+      </div>
+    </header>
+    <main class="wrap">
+      <div class="section-head"><h2>Segera tampil</h2><span>Diurutkan dari yang paling dekat</span></div>
+      <div class="cats">${c.CATS.map((k) => `<button class="pill" data-act="cat" data-v="${k}" aria-pressed="${k === c.cat}">${k}</button>`).join("")}</div>
+      <div class="grid" id="list">${cardsHTML(c)}</div>
+    </main>
+    ${foot}`,
+  event: (c) => {
+    const e = c.ev;
+    return `
+    ${nav(c)}
+    <header class="banner"><img src="${e.img}" alt=""><div class="wrap">
+      <a class="back" href="#/">← Semua event</a>
+      <h1>${e.title}</h1>
+      <div class="facts"><span>${c.dt(e.date, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span><span>19.00 WIB</span><span>${e.venue}, ${e.city}</span></div>
+    </div></header>
+    <div class="wrap detail">
+      <section class="about">
+        <h2>Tentang event</h2>
+        <p>${e.title} di ${e.venue}, ${e.city}. Gerbang dibuka 2 jam sebelum acara. Tunjukkan e-ticket QR di pintu masuk; satu QR untuk satu orang.</p>
+        <p>Tiket yang sudah dibeli tidak dapat dikembalikan kecuali acara dibatalkan oleh penyelenggara.</p>
+      </section>
+      <aside class="panel">
+        <h2>Pilih tiket</h2>
+        ${e.tickets.map((t) => {
+          const n = c.qty[t.id] || 0;
+          return `<div class="tt"><div class="info"><div class="name">${t.name}</div>
+            <div class="sub ${t.left && t.left <= 20 ? "hot" : ""}">${c.rp(t.price)} · ${t.left ? (t.left <= 20 ? `Sisa ${t.left}!` : `Sisa ${t.left}`) : "Habis"}</div></div>
+            ${t.left ? `<div class="step"><button data-act="qty" data-t="${t.id}" data-v="-1" ${n ? "" : "disabled"} aria-label="Kurangi ${t.name}">−</button><span aria-live="polite">${n}</span><button data-act="qty" data-t="${t.id}" data-v="1" ${n >= Math.min(t.left, 10) ? "disabled" : ""} aria-label="Tambah ${t.name}">+</button></div>` : ""}
+          </div>`;
+        }).join("")}
+        <div class="sum"><span>${c.count} tiket</span><strong>${c.rp(c.total)}</strong></div>
+        <button class="pill solid buy-wide" data-act="buy" ${c.count ? "" : "disabled"}>${c.user ? "Lanjut bayar" : "Masuk & beli"}</button>
+        <p class="note">Maks. 10 tiket per transaksi · kursi ditahan 15 menit</p>
+      </aside>
+    </div>
+    <div class="mbar"><div><small>${c.count} tiket</small><strong>${c.rp(c.total)}</strong></div><button class="pill solid" data-act="buy" ${c.count ? "" : "disabled"}>${c.user ? "Lanjut bayar" : "Masuk & beli"}</button></div>
+    ${foot}`;
+  },
+  login: (c) => authPage(c, false),
+  register: (c) => authPage(c, true),
+  checkout: (c) => {
+    const o = c.order, M = [["qris", "QRIS", "Semua e-wallet & m-banking"], ["va", "Virtual Account", "BCA, BNI, BRI, Mandiri"], ["gopay", "GoPay", "Langsung dari aplikasi"]];
+    return `${nav(c, true)}
+    <div class="wrap co">
+      <section>
+        <div class="timer"><span>Selesaikan pembayaran sebelum kursi dilepas</span><b data-countdown>15:00</b></div>
+        <h2>Metode pembayaran</h2>
+        <div class="methods">${M.map(([k, n, s]) => `<button class="method" data-act="pay-method" data-v="${k}" aria-pressed="${o.pay === k}"><span class="dot"></span><span><b>${n}</b><small>${s}</small></span></button>`).join("")}</div>
+      </section>
+      <aside class="panel">
+        <h2>${o.ev.title}</h2>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:12px">${c.dt(o.ev.date)} · ${o.ev.venue}</p>
+        ${o.lines.map((l) => `<div class="line"><span>${l.n}× ${l.name}</span><span>${c.rp(l.n * l.price)}</span></div>`).join("")}
+        <div class="sum"><span>Total</span><strong>${c.rp(o.total)}</strong></div>
+        <button class="pill solid" data-act="pay">Bayar ${c.rp(o.total)}</button>
+        <p class="note">Prototipe: tombol ini mensimulasikan pembayaran sukses</p>
+      </aside>
+    </div>`;
+  },
+  done: (c) => {
+    const o = c.order;
+    const qr = [...Array(21 * 21)].map((_, i) => { const x = i % 21, y = (i / 21) | 0;
+      const fin = (a, b) => x >= a && x < a + 7 && y >= b && y < b + 7;
+      const on = fin(0, 0) || fin(14, 0) || fin(0, 14) ? !(((x % 14 === 1 || x % 14 === 5) && y % 14 > 0 && y % 14 < 6) || ((y % 14 === 1 || y % 14 === 5) && x % 14 > 0 && x % 14 < 6)) : (o.code.charCodeAt((x * 7 + y * 3) % 8) * (x + 1) * (y + 3)) % 7 < 3;
+      return on ? `<rect x="${x}" y="${y}" width="1" height="1"/>` : ""; }).join("");
+    return `${nav(c, true)}
+    <div class="wrap"><article class="ticket">
+      <div class="top"><p style="font-size:14px;opacity:.85">Pembayaran berhasil · e-ticket</p><h1>${o.ev.title}</h1></div>
+      <div class="body">
+        <svg class="qr" viewBox="-1 -1 23 23" role="img" aria-label="QR tiket ${o.code} (contoh)"><rect x="-1" y="-1" width="23" height="23" fill="#fff"/>${qr}</svg>
+        <div class="code">${o.code}</div>
+        <dl><div><dt>Tanggal</dt><dd>${c.dt(o.ev.date)}, 19.00</dd></div><div><dt>Lokasi</dt><dd>${o.ev.venue}</dd></div>
+        <div><dt>Tiket</dt><dd>${o.lines.map((l) => l.n + "× " + l.name).join(", ")}</dd></div><div><dt>Atas nama</dt><dd>${c.esc(c.user?.name)}</dd></div></dl>
+        <a class="pill" style="border-color:#ddd" href="#/">Kembali ke beranda</a>
+      </div>
+    </article></div>`;
+  },
+  after: (c) => {
+    const cv = document.getElementById("wave");
+    if (cv) wave(cv, c.route === "home" ? {} : { cols: 90, cx: 0 }); else stop?.();
+  },
+};
+await import("./proto.js");
+</script>
+</body>
