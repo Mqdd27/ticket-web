@@ -11,6 +11,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("acara/", views.event_list, name="event_list"),
     path("near/", views.near, name="near"),
+    path("section/<int:pk>/acara/", views.section_events, name="section_events"),
     path("e/<slug:slug>/", views.event_detail, name="event_detail"),
     path("e/<slug:slug>/beli/", views.buy, name="buy"),
     path("order/<uuid:code>/", views.order_detail, name="order"),

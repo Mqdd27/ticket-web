@@ -13,6 +13,8 @@
     .scroll-row { scrollbar-width: none; scroll-snap-type: x mandatory; }
     .scroll-row::-webkit-scrollbar { display: none; }
     .scroll-row > * { scroll-snap-align: start; }
+    .chip { @apply shrink-0 h-10 inline-flex items-center px-4 rounded-full bg-white border border-gray-200 text-sm font-semibold hover:border-gray-900 cursor-pointer; }
+    .chip[aria-pressed="true"] { @apply bg-gray-900 border-gray-900 text-white; }
   </style>
   <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
   {% block head %}{% endblock %}

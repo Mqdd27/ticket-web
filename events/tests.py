@@ -56,6 +56,16 @@ class FlowTest(TestCase):
         self.assertContains(self.client.get("/akun/tiket/"), "<svg")
         self.assertContains(self.client.get("/near/?lat=-6.2&lng=106.8"), "km")
 
+    def test_all_events_category_filter(self):
+        s = HomeSection.objects.create(title="Semua", kind="all_events")
+        other = Category.objects.create(name="Seminar", slug="seminar", stage_type="seminar")
+        Event.objects.create(title="Talk Y", slug="y", venue="V", category=other, is_published=True,
+                             starts_at=timezone.now() + timedelta(days=2))
+        r = self.client.get(f"/section/{s.pk}/acara/?cat=musik")
+        self.assertContains(r, "/e/x/")
+        self.assertNotContains(r, "Talk Y")
+        self.assertContains(self.client.get(f"/section/{s.pk}/acara/"), "Talk Y")
+
     def test_admin_generate_button(self):
         s = HomeSection.objects.create(title="Panggung", kind="stage", category=self.cat)
         admin = User.objects.create_superuser("adm", "a@a.test", "x" * 10)

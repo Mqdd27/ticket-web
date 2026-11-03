@@ -40,6 +40,12 @@ def near(request):
     return render(request, "sections/_cards.html", {"events": sections.nearest(lat, lng), "show_distance": True})
 
 
+def section_events(request, pk):
+    """Daftar acara section 'Semua acara' yang difilter kategori (dipanggil chip filter di beranda)."""
+    s = get_object_or_404(HomeSection, pk=pk, kind="all_events", is_active=True)
+    return render(request, "sections/_list.html", {"b": {"s": s, **sections.all_events(s, request.GET.get("cat", ""))}})
+
+
 def event_detail(request, slug):
     event = get_object_or_404(Event.objects.select_related("category"), slug=slug, is_published=True)
     return render(request, "events/detail.html", {"event": event, "ticket_types": event.ticket_types.all()})

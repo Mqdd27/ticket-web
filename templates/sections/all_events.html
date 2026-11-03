@@ -1,24 +1,21 @@
-{% load humanize %}
-<section class="max-w-6xl mx-auto px-4 mt-12">
+<section class="max-w-7xl mx-auto px-4 lg:px-8 mt-12" data-all-events="{% url 'section_events' b.s.pk %}">
   {% url 'event_list' as more %}{% include "sections/_head.html" %}
-  <div class="scroll-row flex gap-2 overflow-x-auto -mx-4 px-4 mb-4">
-    <a href="{% url 'event_list' %}" class="shrink-0 h-10 inline-flex items-center px-4 rounded-full bg-gray-900 text-white text-sm font-semibold">Semua</a>
-    {% for c in b.categories %}<a href="{% url 'event_list' %}?cat={{ c.slug }}" class="shrink-0 h-10 inline-flex items-center px-4 rounded-full bg-white border border-gray-200 text-sm font-semibold hover:border-gray-900">{{ c.name }}</a>{% endfor %}
+  <div class="scroll-row flex gap-2 overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0 mb-4" role="group" aria-label="Filter kategori">
+    <button type="button" data-cat="" aria-pressed="true" class="chip">Semua</button>
+    {% for c in b.categories %}<button type="button" data-cat="{{ c.slug }}" aria-pressed="false" class="chip">{{ c.name }}</button>{% endfor %}
   </div>
-  <div class="grid gap-3 md:grid-cols-2">
-    {% for e in b.events %}
-    <a href="{% url 'event_detail' e.slug %}" class="flex gap-4 bg-white rounded-2xl border border-gray-200 p-3 hover:border-blue-500 hover:shadow-md transition">
-      <div class="w-16 shrink-0 rounded-xl bg-blue-50 text-blue-700 flex flex-col items-center justify-center">
-        <span class="text-2xl font-extrabold leading-none">{{ e.starts_at|date:"d" }}</span>
-        <span class="text-xs font-bold uppercase">{{ e.starts_at|date:"M" }}</span>
-      </div>
-      {% if e.image_url %}<img src="{{ e.image_url }}" alt="" loading="lazy" class="hidden sm:block w-24 h-20 rounded-xl object-cover">{% endif %}
-      <div class="min-w-0 flex-1 py-0.5">
-        <h3 class="font-bold truncate">{{ e.title }}</h3>
-        <p class="text-sm text-gray-500 truncate">{{ e.venue }}{% if e.city %}, {{ e.city }}{% endif %} · {{ e.starts_at|date:"H:i" }}</p>
-        <p class="mt-1 text-sm font-bold">{% if e.min_price %}Rp{{ e.min_price|intcomma }}{% elif e.min_price == 0 %}<span class="text-emerald-600">Gratis</span>{% endif %}<span class="ml-2 text-xs font-semibold text-gray-400">{{ e.category.name }}</span></p>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
+  <div class="grid gap-3 md:grid-cols-2 transition-opacity" data-list aria-live="polite">{% include "sections/_list.html" %}</div>
 </section>
+<script>
+document.querySelectorAll("[data-all-events]").forEach((sec) => {
+  const list = sec.querySelector("[data-list]"), more = sec.querySelector("a[href$='/acara/'], a[href*='/acara/?']");
+  sec.querySelectorAll("[data-cat]").forEach((btn) => btn.addEventListener("click", async () => {
+    sec.querySelectorAll("[data-cat]").forEach((b) => b.setAttribute("aria-pressed", b === btn));
+    list.style.opacity = 0.4;
+    const cat = btn.dataset.cat;
+    list.innerHTML = await (await fetch(sec.dataset.allEvents + "?cat=" + encodeURIComponent(cat))).text();
+    list.style.opacity = 1;
+    if (more) more.href = "/acara/" + (cat ? "?cat=" + encodeURIComponent(cat) : "");
+  }));
+});
+</script>

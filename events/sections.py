@@ -37,9 +37,12 @@ def near_you(section):
     return {}  # diisi via JS (geolocation) -> /near/?lat=&lng=
 
 
-def all_events(section):
+def all_events(section, cat=""):
     from .models import Category
-    return {"events": _filtered(section)[: section.limit], "categories": Category.objects.all()}
+    qs = _filtered(section)
+    if cat:
+        qs = qs.filter(category__slug=cat)
+    return {"events": qs[: section.limit], "categories": Category.objects.all(), "cat": cat}
 
 
 def by_region(section):
