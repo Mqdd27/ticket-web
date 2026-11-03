@@ -99,6 +99,13 @@ def my_tickets(request):
     })
 
 
+@login_required
+def ticket_detail(request, code):
+    order = get_object_or_404(Order.objects.select_related("ticket_type__event", "promo").prefetch_related("tickets"),
+                              code=code, user=request.user, status=Order.PAID)
+    return render(request, "account/ticket_detail.html", {"o": order, "event": order.ticket_type.event})
+
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(label="Email")
     first_name = forms.CharField(label="Nama lengkap", max_length=150)

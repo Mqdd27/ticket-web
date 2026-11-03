@@ -54,6 +54,10 @@ class FlowTest(TestCase):
         self.assertRedirects(r, f"/order/{order.code}/")
         self.client.post(r.url, {"pay": 1})
         self.assertContains(self.client.get("/akun/tiket/"), "<svg")
+        detail = self.client.get(f"/akun/tiket/{order.code}/")
+        self.assertContains(detail, 'id="map"')
+        self.client.force_login(User.objects.create_user("b", password="x" * 10))
+        self.assertEqual(self.client.get(f"/akun/tiket/{order.code}/").status_code, 404)  # tiket orang lain
         self.assertContains(self.client.get("/near/?lat=-6.2&lng=106.8"), "km")
 
     def test_all_events_category_filter(self):

@@ -8,6 +8,7 @@ urlpatterns = [
     path("akun/", include("django.contrib.auth.urls")),
     path("akun/daftar/", views.register, name="register"),
     path("akun/tiket/", views.my_tickets, name="my_tickets"),
+    path("akun/tiket/<uuid:code>/", views.ticket_detail, name="ticket_detail"),
     path("", views.home, name="home"),
     path("acara/", views.event_list, name="event_list"),
     path("near/", views.near, name="near"),

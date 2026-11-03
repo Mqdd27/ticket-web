@@ -24,8 +24,9 @@
     <div class="flex flex-wrap items-center gap-4 p-4 border-b border-dashed border-gray-300">
       {% if e.image_url %}<img src="{{ e.image_url }}" alt="" class="w-20 h-16 rounded-xl object-cover">{% endif %}
       <div class="flex-1 min-w-48">
-        <a href="{% url 'event_detail' e.slug %}" class="font-bold hover:underline">{{ e.title }}</a>
+        <a href="{% url 'ticket_detail' o.code %}" class="font-bold hover:underline">{{ e.title }}</a>
         <p class="text-sm text-gray-500">{{ e.starts_at|date:"D, d M Y H:i" }} · {{ e.venue }}{% if e.city %}, {{ e.city }}{% endif %}</p>
+        <a href="{% url 'ticket_detail' o.code %}" class="mt-1 inline-flex h-9 items-center text-sm font-semibold text-blue-600 hover:underline">Lihat detail & lokasi</a>
       </div>
       <div class="text-right text-sm">
         <p class="font-bold">{{ o.quantity }}× {{ o.ticket_type.name }}</p>
