@@ -29,6 +29,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-insecure-key')
 DEBUG = os.environ.get('DEBUG', '1') == '1'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+VERCEL = bool(os.environ.get('VERCEL'))
+if VERCEL:
+    ALLOWED_HOSTS.append('.vercel.app')
+    CSRF_TRUSTED_ORIGINS = ['https://*.vercel.app']
 
 
 # Application definition
@@ -46,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,6 +85,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(default='postgres:///ticket_web', conn_max_age=600)
 }
+# Preview Vercel tanpa DATABASE_URL: SQLite di /tmp, di-migrate + seed saat cold start (lihat wsgi.py).
+# ponytail: data reset tiap cold start & tiap instance punya DB sendiri; pasang DATABASE_URL (Neon) untuk data permanen.
+PREVIEW_SQLITE = VERCEL and not os.environ.get('DATABASE_URL')
+if PREVIEW_SQLITE:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': '/tmp/db.sqlite3'}
+    SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'  # login tetap nyangkut walau instance ganti
 
 
 # Password validation
@@ -118,6 +129,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+WHITENOISE_USE_FINDERS = True  # sajikan static langsung tanpa collectstatic (cukup buat preview)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
