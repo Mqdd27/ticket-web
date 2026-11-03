@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -7,9 +9,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from . import sections
+from . import payments, sections
 from .models import Category, Event, HomeSection, Order, PromoError, SoldOut, apply_promo, issue_tickets, reserve
 
 
@@ -70,23 +74,58 @@ def buy(request, slug):
 @login_required
 def order_detail(request, code):
     order = get_object_or_404(Order.objects.select_related("ticket_type__event", "promo"), code=code, user=request.user)
+    if request.method == "GET" and order.status == Order.PENDING and order.snap_token and payments.enabled():
+        order = payments.sync(order)  # pembeli balik dari Snap: cek status langsung ke Midtrans
+        if order.status == Order.PAID:
+            messages.success(request, "Pembayaran berhasil. E-ticket sudah terbit.")
+            return redirect("ticket_detail", code=order.code)
     if request.method == "POST" and order.status == Order.PENDING and not order.is_expired:
-        if "promo" in request.POST:
+        if "promo" in request.POST and order.snap_token:
+            messages.error(request, "Promo tidak bisa diubah setelah pembayaran dimulai.")
+        elif "promo" in request.POST:
             try:
                 apply_promo(order, request.POST["promo"])
                 messages.success(request, f"Promo {order.promo.code} terpasang: hemat Rp{order.discount:,}".replace(",", "."))
             except PromoError as e:
                 messages.error(request, str(e))
         elif "pay" in request.POST:
-            # ponytail: simulasi bayar sampai Midtrans dipasang; webhook Midtrans nanti panggil issue_tickets()
-            if not settings.DEBUG and order.total > 0:
+            # Tiket gratis langsung terbit; berbayar lewat Midtrans (order_pay). Simulasi hanya saat DEBUG tanpa key Midtrans.
+            if order.total > 0 and (payments.enabled() or not settings.DEBUG):
                 messages.error(request, "Pembayaran online belum aktif.")
             else:
                 issue_tickets(order)
                 messages.success(request, "Pembayaran berhasil. E-ticket sudah terbit.")
                 return redirect("my_tickets")
         return redirect("order", code=code)
-    return render(request, "events/order.html", {"order": order, "debug": settings.DEBUG})
+    return render(request, "events/order.html", {
+        "order": order, "debug": settings.DEBUG, "midtrans": payments.enabled(),
+        "snap_js": payments.snap_js_url(), "client_key": settings.MIDTRANS_CLIENT_KEY,
+    })
+
+
+@require_POST
+@login_required
+def order_pay(request, code):
+    """Buat/ambil token Snap Midtrans untuk popup pembayaran."""
+    order = get_object_or_404(Order.objects.select_related("ticket_type__event", "promo", "user"), code=code, user=request.user)
+    if order.status != Order.PENDING or order.is_expired or order.total <= 0 or not payments.enabled():
+        return JsonResponse({"error": "Order tidak bisa dibayar"}, status=400)
+    try:
+        token = payments.snap_token(order, request.build_absolute_uri(f"/order/{order.code}/"))
+    except payments.PaymentError:
+        return JsonResponse({"error": "Gagal menghubungi Midtrans, coba lagi"}, status=502)
+    return JsonResponse({"token": token})
+
+
+@csrf_exempt
+@require_POST
+def midtrans_notify(request):
+    """Webhook Midtrans. Isi URL ini di dashboard: Settings → Payment → Notification URL."""
+    try:
+        data = json.loads(request.body)
+    except ValueError:
+        return HttpResponse(status=400)
+    return HttpResponse(status=200 if payments.apply_status(data) else 403)
 
 
 @login_required

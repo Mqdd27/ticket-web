@@ -16,4 +16,6 @@ urlpatterns = [
     path("e/<slug:slug>/", views.event_detail, name="event_detail"),
     path("e/<slug:slug>/beli/", views.buy, name="buy"),
     path("order/<uuid:code>/", views.order_detail, name="order"),
+    path("order/<uuid:code>/bayar/", views.order_pay, name="order_pay"),
+    path("payment/midtrans/notify/", views.midtrans_notify, name="midtrans_notify"),
 ]

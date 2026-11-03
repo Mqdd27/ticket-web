@@ -7,6 +7,8 @@
   <h1 class="text-2xl font-extrabold">Pembayaran</h1>
   {% if order.status == "paid" %}
     <p class="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 p-4">Order ini sudah lunas. <a class="font-semibold underline" href="{% url 'my_tickets' %}">Lihat e-ticket</a></p>
+  {% elif order.status == "cancelled" %}
+    <p class="mt-4 rounded-xl bg-red-50 border border-red-200 p-4">Pembayaran dibatalkan atau kedaluwarsa. <a class="font-semibold underline" href="{% url 'event_detail' e.slug %}">Pesan ulang</a></p>
   {% elif order.is_expired %}
     <p class="mt-4 rounded-xl bg-red-50 border border-red-200 p-4">Waktu pembayaran habis dan tiket sudah dilepas. <a class="font-semibold underline" href="{% url 'event_detail' e.slug %}">Pesan ulang</a></p>
   {% else %}
@@ -27,28 +29,46 @@
       <div class="flex justify-between border-t border-gray-200 pt-3 text-lg font-extrabold"><dt>Total</dt><dd>Rp{{ order.total|intcomma }}</dd></div>
     </dl>
     {% if order.status == "pending" and not order.is_expired %}
+    {% if order.snap_token %}<p class="mt-5 text-sm text-gray-500">Pembayaran sudah dimulai, kode promo terkunci.</p>{% else %}
     <form method="post" class="mt-5 flex gap-2">{% csrf_token %}
       <input name="promo" placeholder="Kode promo" aria-label="Kode promo" value="{{ order.promo.code|default:'' }}" class="h-11 flex-1 min-w-0 rounded-lg border border-gray-300 px-4 uppercase">
       <button class="h-11 px-4 rounded-lg border border-gray-900 font-semibold hover:bg-gray-900 hover:text-white">Pakai</button>
-    </form>
-    <fieldset class="mt-6">
-      <legend class="font-bold mb-2">Metode pembayaran</legend>
-      <div class="grid sm:grid-cols-3 gap-2 text-sm">
-        <label class="rounded-xl border border-gray-200 p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 cursor-pointer"><input type="radio" name="method" checked class="accent-blue-600"> <b>QRIS</b><span class="block text-gray-500">Semua e-wallet</span></label>
-        <label class="rounded-xl border border-gray-200 p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 cursor-pointer"><input type="radio" name="method" class="accent-blue-600"> <b>Virtual Account</b><span class="block text-gray-500">BCA, BNI, BRI</span></label>
-        <label class="rounded-xl border border-gray-200 p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 cursor-pointer"><input type="radio" name="method" class="accent-blue-600"> <b>GoPay</b><span class="block text-gray-500">Dari aplikasi</span></label>
-      </div>
-    </fieldset>
+    </form>{% endif %}
+    {% if midtrans and order.total %}
+    <button type="button" data-pay="{% url 'order_pay' order.code %}" class="mt-6 w-full h-12 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 disabled:opacity-60">Bayar Rp{{ order.total|intcomma }}</button>
+    <p class="mt-2 text-xs text-gray-500 text-center">QRIS, Virtual Account, GoPay, ShopeePay, kartu kredit · diproses Midtrans</p>
+    <p data-pay-error class="mt-2 text-sm text-red-600 text-center" role="alert"></p>
+    {% else %}
     <form method="post" class="mt-6">{% csrf_token %}
       <button name="pay" value="1" class="w-full h-12 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">{% if order.total %}Bayar Rp{{ order.total|intcomma }}{% else %}Klaim tiket gratis{% endif %}</button>
-      {% if debug and order.total %}<p class="mt-2 text-xs text-gray-500 text-center">Mode dev: tombol ini mensimulasikan pembayaran sukses (Midtrans belum dipasang).</p>{% endif %}
+      {% if debug and order.total %}<p class="mt-2 text-xs text-gray-500 text-center">Mode dev: key Midtrans belum diisi, tombol ini mensimulasikan pembayaran sukses.</p>{% endif %}
     </form>
+    {% endif %}
     {% endif %}
   </div>
 </div>
 {% endwith %}
 {% endblock %}
 {% block scripts %}
+{% if midtrans and order.status == "pending" and not order.is_expired %}
+<script src="{{ snap_js }}" data-client-key="{{ client_key }}"></script>
+<script>
+  const payBtn = document.querySelector("[data-pay]");
+  payBtn?.addEventListener("click", async () => {
+    const err = document.querySelector("[data-pay-error]");
+    err.textContent = "";
+    payBtn.disabled = true;
+    try {
+      const r = await fetch(payBtn.dataset.pay, { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      // Sukses / pending (VA) -> muat ulang: server cek status ke Midtrans lalu terbitkan tiket
+      window.snap.pay(d.token, { onSuccess: () => location.reload(), onPending: () => location.reload(),
+        onError: () => (err.textContent = "Pembayaran gagal, coba metode lain."), onClose: () => (payBtn.disabled = false) });
+    } catch (e) { err.textContent = e.message || "Gagal memulai pembayaran."; payBtn.disabled = false; }
+  });
+</script>
+{% endif %}
 <script>
   const el = document.querySelector("[data-deadline]");
   if (el) {

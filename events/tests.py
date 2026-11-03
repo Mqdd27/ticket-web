@@ -78,3 +78,50 @@ class FlowTest(TestCase):
         s.refresh_from_db()
         self.assertEqual(s.stage_scene["type"], "concert")
         self.assertContains(self.client.get("/"), "data-stage")
+
+
+@override_settings(MIDTRANS_SERVER_KEY="SB-Mid-server-test", MIDTRANS_CLIENT_KEY="SB-Mid-client-test")
+class MidtransTest(TestCase):
+    def setUp(self):
+        self.u = User.objects.create_user("m", email="m@x.test", password="x" * 10)
+        ev = Event.objects.create(title="Konser", slug="k", venue="V", is_published=True, starts_at=timezone.now() + timedelta(days=3))
+        self.tt = TicketType.objects.create(event=ev, name="Reg", price=100000, quota=5)
+        self.order = reserve(self.tt.id, self.u, 2)
+
+    def notif(self, status, amount="200000.00", key="SB-Mid-server-test", **extra):
+        import hashlib
+        d = {"order_id": str(self.order.code), "status_code": "200", "gross_amount": amount, "transaction_status": status,
+             "payment_type": "qris", **extra}
+        d["signature_key"] = hashlib.sha512(f"{d['order_id']}200{amount}{key}".encode()).hexdigest()
+        return self.client.post("/payment/midtrans/notify/", d, content_type="application/json")
+
+    def test_webhook_settlement_issues_tickets(self):
+        self.assertEqual(self.notif("settlement").status_code, 200)
+        self.order.refresh_from_db()
+        self.assertEqual((self.order.status, self.order.tickets.count(), self.order.payment_type), (Order.PAID, 2, "qris"))
+
+    def test_webhook_rejects_forged_or_wrong_amount(self):
+        self.assertEqual(self.notif("settlement", key="tebakan").status_code, 403)
+        self.assertEqual(self.notif("settlement", amount="1.00").status_code, 403)
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.status, Order.PENDING)
+
+    def test_webhook_expire_releases_quota(self):
+        self.notif("expire")
+        self.order.refresh_from_db()
+        self.assertEqual((self.order.status, self.tt.available()), (Order.CANCELLED, 5))
+
+    def test_pay_creates_snap_token_once(self):
+        import io, json
+        from unittest import mock
+        sent = []
+        def fake(req, timeout):
+            sent.append(json.loads(req.data))
+            return io.BytesIO(b'{"token": "tok-123", "redirect_url": "x"}')
+        self.client.force_login(self.u)
+        with mock.patch("urllib.request.urlopen", fake):
+            r1 = self.client.post(f"/order/{self.order.code}/bayar/")
+            r2 = self.client.post(f"/order/{self.order.code}/bayar/")
+        self.assertEqual((r1.json(), r2.json()), ({"token": "tok-123"}, {"token": "tok-123"}))
+        self.assertEqual(len(sent), 1)  # token dipakai ulang
+        self.assertEqual(sent[0]["transaction_details"], {"order_id": str(self.order.code), "gross_amount": 200000})
