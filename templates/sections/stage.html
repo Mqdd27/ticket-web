@@ -1,0 +1,9 @@
+<section class="max-w-6xl mx-auto px-4 mt-12">
+  {% if b.s.category %}{% url 'event_list' as base %}{% with more=base|add:"?cat="|add:b.s.category.slug %}{% include "sections/_head.html" %}{% endwith %}{% else %}{% include "sections/_head.html" %}{% endif %}
+  {% if b.s.stage_scene %}
+  <div class="relative h-[340px] sm:h-[440px] rounded-3xl overflow-hidden bg-gray-100 mb-4" data-stage aria-label="Panggung 3D interaktif {{ b.s.category.name }}">{{ b.s.stage_scene|json_script }}</div>
+  {% elif user.is_staff %}
+  <p class="mb-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">Panggung 3D section ini belum digenerate. <a class="font-semibold underline" href="{% url 'admin:events_homesection_change' b.s.pk %}">Generate di admin</a> (pesan ini hanya terlihat oleh admin).</p>
+  {% endif %}
+  {% include "sections/_cards.html" with events=b.events %}
+</section>

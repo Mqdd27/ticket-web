@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Jelajah acara · TicketWeb{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 pt-8">
+  <h1 class="text-3xl font-extrabold tracking-tight">{% if city %}Acara di {{ city }}{% elif q %}Hasil untuk "{{ q }}"{% else %}Jelajah acara{% endif %}</h1>
+  <form class="mt-4 flex flex-wrap gap-2" role="search">
+    <input name="q" value="{{ q }}" placeholder="Cari…" aria-label="Cari acara" class="h-11 flex-1 min-w-48 rounded-lg border border-gray-300 px-4 bg-white">
+    {% if city %}<input type="hidden" name="city" value="{{ city }}">{% endif %}
+    <select name="cat" aria-label="Kategori" class="h-11 rounded-lg border border-gray-300 px-3 bg-white" onchange="this.form.submit()">
+      <option value="">Semua kategori</option>
+      {% for c in categories %}<option value="{{ c.slug }}" {% if c.slug == cat %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+    </select>
+    <button class="h-11 px-5 rounded-lg bg-blue-600 text-white font-semibold">Cari</button>
+    {% if q or cat or city %}<a href="{% url 'event_list' %}" class="h-11 inline-flex items-center px-3 text-sm font-semibold text-gray-500">Reset</a>{% endif %}
+  </form>
+  <p class="mt-4 text-sm text-gray-500">{{ events|length }} acara</p>
+  <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for e in events %}{% include "sections/_card.html" %}{% empty %}<p class="text-gray-500">Tidak ada acara yang cocok.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

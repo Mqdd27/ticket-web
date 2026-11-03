@@ -1,0 +1,7 @@
+<div class="flex items-end justify-between gap-4 mb-4">
+  <div>
+    <h2 class="text-2xl font-extrabold tracking-tight">{{ b.s.title }}</h2>
+    {% if b.s.subtitle %}<p class="text-gray-500 text-sm mt-0.5">{{ b.s.subtitle }}</p>{% endif %}
+  </div>
+  {% if more %}<a href="{{ more }}" class="shrink-0 text-sm font-semibold text-blue-600 hover:underline inline-flex h-11 items-center">Lihat semua</a>{% endif %}
+</div>

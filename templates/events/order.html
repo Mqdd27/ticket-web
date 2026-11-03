@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Pembayaran · TicketWeb{% endblock %}
+{% block content %}
+{% with e=order.ticket_type.event %}
+<div class="max-w-3xl mx-auto px-4 pt-8">
+  <h1 class="text-2xl font-extrabold">Pembayaran</h1>
+  {% if order.status == "paid" %}
+    <p class="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 p-4">Order ini sudah lunas. <a class="font-semibold underline" href="{% url 'my_tickets' %}">Lihat e-ticket</a></p>
+  {% elif order.is_expired %}
+    <p class="mt-4 rounded-xl bg-red-50 border border-red-200 p-4">Waktu pembayaran habis dan tiket sudah dilepas. <a class="font-semibold underline" href="{% url 'event_detail' e.slug %}">Pesan ulang</a></p>
+  {% else %}
+    <div class="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 flex items-center justify-between gap-4">
+      <span class="text-sm text-amber-900">Selesaikan pembayaran sebelum tiket dilepas ke pembeli lain.</span>
+      <b class="text-2xl tabular-nums text-amber-900" data-deadline="{{ order.expires_at|date:'c' }}">--:--</b>
+    </div>
+  {% endif %}
+
+  <div class="mt-6 bg-white rounded-2xl border border-gray-200 p-5">
+    <div class="flex gap-4">
+      {% if e.image_url %}<img src="{{ e.image_url }}" alt="" class="w-24 h-20 rounded-xl object-cover">{% endif %}
+      <div><h2 class="font-bold">{{ e.title }}</h2><p class="text-sm text-gray-500">{{ e.starts_at|date:"D, d M Y H:i" }} · {{ e.venue }}</p></div>
+    </div>
+    <dl class="mt-5 space-y-2 text-sm">
+      <div class="flex justify-between"><dt>{{ order.quantity }}× {{ order.ticket_type.name }}</dt><dd>Rp{{ order.subtotal|intcomma }}</dd></div>
+      {% if order.promo %}<div class="flex justify-between text-emerald-700"><dt>Promo {{ order.promo.code }}</dt><dd>−Rp{{ order.discount|intcomma }}</dd></div>{% endif %}
+      <div class="flex justify-between border-t border-gray-200 pt-3 text-lg font-extrabold"><dt>Total</dt><dd>Rp{{ order.total|intcomma }}</dd></div>
+    </dl>
+    {% if order.status == "pending" and not order.is_expired %}
+    <form method="post" class="mt-5 flex gap-2">{% csrf_token %}
+      <input name="promo" placeholder="Kode promo" aria-label="Kode promo" value="{{ order.promo.code|default:'' }}" class="h-11 flex-1 min-w-0 rounded-lg border border-gray-300 px-4 uppercase">
+      <button class="h-11 px-4 rounded-lg border border-gray-900 font-semibold hover:bg-gray-900 hover:text-white">Pakai</button>
+    </form>
+    <fieldset class="mt-6">
+      <legend class="font-bold mb-2">Metode pembayaran</legend>
+      <div class="grid sm:grid-cols-3 gap-2 text-sm">
+        <label class="rounded-xl border border-gray-200 p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 cursor-pointer"><input type="radio" name="method" checked class="accent-blue-600"> <b>QRIS</b><span class="block text-gray-500">Semua e-wallet</span></label>
+        <label class="rounded-xl border border-gray-200 p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 cursor-pointer"><input type="radio" name="method" class="accent-blue-600"> <b>Virtual Account</b><span class="block text-gray-500">BCA, BNI, BRI</span></label>
+        <label class="rounded-xl border border-gray-200 p-3 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 cursor-pointer"><input type="radio" name="method" class="accent-blue-600"> <b>GoPay</b><span class="block text-gray-500">Dari aplikasi</span></label>
+      </div>
+    </fieldset>
+    <form method="post" class="mt-6">{% csrf_token %}
+      <button name="pay" value="1" class="w-full h-12 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700">{% if order.total %}Bayar Rp{{ order.total|intcomma }}{% else %}Klaim tiket gratis{% endif %}</button>
+      {% if debug and order.total %}<p class="mt-2 text-xs text-gray-500 text-center">Mode dev: tombol ini mensimulasikan pembayaran sukses (Midtrans belum dipasang).</p>{% endif %}
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}
+{% block scripts %}
+<script>
+  const el = document.querySelector("[data-deadline]");
+  if (el) {
+    const end = new Date(el.dataset.deadline).getTime();
+    const tick = () => {
+      const s = Math.max(0, Math.round((end - Date.now()) / 1000));
+      el.textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+      if (!s) location.reload();
+    };
+    tick(); setInterval(tick, 1000);
+  }
+</script>
+{% endblock %}

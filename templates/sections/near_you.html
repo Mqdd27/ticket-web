@@ -1,0 +1,19 @@
+<section class="max-w-6xl mx-auto px-4 mt-12" data-near>
+  {% include "sections/_head.html" %}
+  <div data-near-body class="rounded-2xl border border-dashed border-gray-300 bg-white p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+    <svg class="w-10 h-10 text-blue-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    <p class="flex-1 text-gray-600">Izinkan lokasi untuk melihat acara terdekat. Lokasimu hanya dipakai untuk mengurutkan, tidak disimpan.</p>
+    <button type="button" data-near-btn class="h-11 px-5 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700">Gunakan lokasiku</button>
+  </div>
+</section>
+<script>
+document.querySelectorAll("[data-near-btn]").forEach((btn) => btn.onclick = () => {
+  const body = btn.closest("[data-near-body]");
+  btn.disabled = true; btn.textContent = "Mencari lokasi…";
+  navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+    const r = await fetch(`{% url 'near' %}?lat=${coords.latitude}&lng=${coords.longitude}`);
+    body.outerHTML = await r.text();
+  }, () => { btn.disabled = false; btn.textContent = "Coba lagi"; body.querySelector("p").textContent = "Akses lokasi ditolak. Aktifkan izin lokasi di browser, atau lihat acara per daerah di bawah."; },
+  { timeout: 10000, maximumAge: 600000 });
+});
+</script>

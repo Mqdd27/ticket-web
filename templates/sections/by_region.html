@@ -1,0 +1,15 @@
+<section class="max-w-6xl mx-auto px-4 mt-12">
+  {% include "sections/_head.html" %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+    {% for c in b.cities %}
+    <a href="{% url 'event_list' %}?city={{ c.city|urlencode }}" class="group relative h-32 sm:h-40 rounded-2xl overflow-hidden bg-gray-800">
+      {% if c.img %}<img src="{{ c.img }}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:scale-105 group-hover:opacity-80 transition duration-500">{% endif %}
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+      <div class="absolute left-4 bottom-3 text-white">
+        <p class="text-lg font-extrabold">{{ c.city }}</p>
+        <p class="text-sm text-white/80">{{ c.n }} acara</p>
+      </div>
+    </a>
+    {% empty %}<p class="text-gray-500">Belum ada acara.</p>{% endfor %}
+  </div>
+</section>

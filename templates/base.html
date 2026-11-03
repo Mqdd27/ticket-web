@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}TicketWeb · Tiket konser, festival, stand-up{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  {# ponytail: Tailwind CDN buat dev; ganti ke Tailwind standalone CLI build sebelum production #}
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme { --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif; }
+    .scroll-row { scrollbar-width: none; scroll-snap-type: x mandatory; }
+    .scroll-row::-webkit-scrollbar { display: none; }
+    .scroll-row > * { scroll-snap-align: start; }
+  </style>
+  <script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+  {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col antialiased">
+  <header class="bg-white/90 backdrop-blur border-b border-gray-200 sticky top-0 z-40">
+    <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center gap-4">
+      <a href="{% url 'home' %}" class="font-extrabold text-xl tracking-tight text-blue-600 shrink-0">TicketWeb</a>
+      <form action="{% url 'event_list' %}" class="hidden md:block flex-1 max-w-md" role="search">
+        <input name="q" value="{{ request.GET.q }}" placeholder="Cari konser, stand-up, kota…" aria-label="Cari acara"
+               class="w-full h-10 rounded-full bg-gray-100 px-4 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-blue-500">
+      </form>
+      <div class="ml-auto flex items-center gap-2 text-sm font-semibold">
+        <a href="{% url 'event_list' %}" class="hidden sm:inline-flex h-11 items-center px-3 rounded-lg hover:bg-gray-100">Jelajah</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'my_tickets' %}" class="inline-flex h-11 items-center px-3 rounded-lg hover:bg-gray-100">Tiket saya</a>
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+            <button class="h-11 px-3 rounded-lg text-gray-500 hover:bg-gray-100" title="Keluar dari {{ user.username }}">Keluar</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}" class="inline-flex h-11 items-center px-3 rounded-lg hover:bg-gray-100">Masuk</a>
+          <a href="{% url 'register' %}" class="inline-flex h-11 items-center px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700">Daftar</a>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  {% if messages %}
+  <div class="max-w-6xl mx-auto px-4 pt-4 w-full space-y-2" role="status">
+    {% for m in messages %}
+    <p class="rounded-lg px-4 py-3 text-sm font-medium {% if m.tags == 'error' %}bg-red-50 text-red-700 border border-red-200{% else %}bg-emerald-50 text-emerald-800 border border-emerald-200{% endif %}">{{ m }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <main class="flex-1 w-full">{% block content %}{% endblock %}</main>
+
+  <footer class="border-t border-gray-200 bg-white mt-16">
+    <div class="max-w-6xl mx-auto px-4 py-8 text-sm text-gray-500 flex flex-wrap gap-4 justify-between">
+      <span>© 2026 TicketWeb</span>
+      <span>Bayar via QRIS, Virtual Account, e-wallet</span>
+    </div>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
